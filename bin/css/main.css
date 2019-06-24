@@ -1,0 +1,25 @@
+body{
+    margin:0;
+    padding:0;
+}
+.up{
+    color:#ffffff;
+    background: #181818;
+    font-size: 18px;
+    height: 2em;
+    line-height: 2em;
+    text-align: center;
+    position: relative;
+}
+.addDateBase{
+    background-color: #1875d1;
+    height: 2em;
+    width: 2em;
+    color: #ffffff;
+    font-size: 18px;
+    text-align: center;
+    line-height: 2em;
+    position: absolute;
+    top:15px;
+    left:15px;
+}
