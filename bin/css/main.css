@@ -1,25 +1,58 @@
 body{
     margin:0;
     padding:0;
+    font-family: Arial, Helvetica, sans-serif
 }
-.up{
+.block-header{
     color:#ffffff;
     background: #181818;
-    font-size: 18px;
-    height: 2em;
-    line-height: 2em;
-    text-align: center;
-    position: relative;
+    height: 30px;
+    display: flex;
 }
-.addDateBase{
+
+.block-header__adder-bd{
     background-color: #1875d1;
-    height: 2em;
-    width: 2em;
-    color: #ffffff;
-    font-size: 18px;
-    text-align: center;
-    line-height: 2em;
     position: absolute;
     top:15px;
     left:15px;
+    height: 24px;
+    width: 24px;
+    margin: 3px 3px 3px 0;
+    text-align: center;
+    line-height: 24px;
+}
+
+.content{
+    height: 24px;
+}
+
+.content-block{
+    /* background-color: #1875d1; */
+    right: 0;
+    width: 100%-24px;
+}
+.content-block-day{
+    margin-left: 15px;
+}
+
+.content-block-day__tool{
+    background-color: #181818;
+    height: 24px ;
+    width: 24px;
+}
+
+.block-header__text{
+    position: absolute;
+    left: 50%;
+    top:6px;
+    transform: translate(-50%,0);
+}
+
+.title{
+    width: 100%;
+    text-align: center;
+}
+
+.title__name-bd{
+    font-size: 24px;
 }
