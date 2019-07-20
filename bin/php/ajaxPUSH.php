@@ -17,14 +17,44 @@
   // $who = $is_who[ $_POST["who"] ];
   print_r($_POST);
   if ($_POST["who"] != "all"){
-      if ($_POST["is_del"] != "false") {
-          $sql = "DELETE FROM ".$_POST["who"]."_name WHERE name = '". $_POST["what"]."';";
-      }else{
-          $sql = "INSERT INTO ".$_POST["who"]."_name VALUES (NULL, '".$_POST["what"]."');";
-      }
+        if ($_POST["is_del"] != "false") {
+            // $first_sql = "SELECT * FROM ".$_POST["who"]."_name WHERE name = '". $_POST["what"]."';";
+            // $first_timetable = mysqli_query($link, $first_sql) or die ("ошибка с запросом first_sql ".mysqli_connect_error($link));
+            $id = $_POST["id"];
+
+            $delete_sql = "DELETE FROM ".$_POST["who"]."_name WHERE id = '".$id."' LIMIT 1;";
+            $timetable = mysqli_query($link, $delete_sql) or die ("ошибка с запросом delete_sql ".mysqli_connect_error($link));
+
+            $select_sql = "SELECT * FROM ".$_POST["who"]."_name;";
+            $select_timetable = mysqli_query($link, $select_sql) or die ("ошибка с запросом select_sql ".mysqli_connect_error($link));
+            $rows = mysqli_num_rows($select_timetable);
+            for ($i = 1;$i<=$rows;$i++){
+                $row = mysqli_fetch_row($select_timetable);
+
+                $delete_sql = "DELETE FROM ".$_POST["who"]."_name WHERE name = '".$row[1]."' LIMIT 1;";
+                $timetable = mysqli_query($link, $delete_sql) or die ("ошибка с запросом delete_sql ".mysqli_connect_error($link));
+
+                $insert_sql = "INSERT INTO ".$_POST["who"]."_name VALUES (".$i.", '".$row[1]."');";
+                $insert_timetable = mysqli_query($link, $insert_sql) or die ("ошибка с запросом insert_sql ".mysqli_connect_error($link));
+            }
+        }else{
+            $id = $_POST["id"];
+            if ($id == ""){
+
+                $defaul_sql = "SELECT * FROM ".$_POST["who"]."_name;";
+                $defaul_timetable = mysqli_query($link, $defaul_sql) or die ("ошибка с запросом defaul_sql ".mysqli_connect_error($link));
+                $id = mysqli_num_rows($defaul_timetable)+1;
+            }
+
+            $delete_sql = "DELETE FROM ".$_POST["who"]."_name WHERE id = '". $id."' LIMIT 1;";
+            $delete_timetable = mysqli_query($link, $delete_sql) or die ("ошибка с запросом delete_sql ".mysqli_connect_error($link));
+
+            $insert_sql = "INSERT INTO ".$_POST["who"]."_name VALUES (".$id.", '".$_POST["what"]."');";
+            $insert_timetable = mysqli_query($link, $insert_sql) or die ("ошибка с запросом insert_sql".mysqli_connect_error($link));
+        }
   }
   print_r($sql);
-  $timetable = mysqli_query($link, $sql) or die ("ошибка с запросом ".mysqli_connect_error($link));
+  // $timetable = mysqli_query($link, $sql) or die ("ошибка с запросом ".mysqli_connect_error($link));
   // }else {
   //     if ($_POST["is_del"] == true) {
   //         $sql = "DELETE FROM `timetable` WHERE `name` = ". $_POST["what"];
