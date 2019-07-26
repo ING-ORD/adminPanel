@@ -189,7 +189,9 @@ function createEll_popUP(val,func){
         // var text = CreateElementHTML("div","Группа",{"class":"pop-up__text"});
         // var input = CreateElementHTML("input","",{"class":"pop-up__input"});
         input.defaultValue = val;
-        return  text.outerHTML + input.outerHTML + inputId.outerHTML;
+        var selector = CreateElementHTML("div",text.outerHTML + input.outerHTML + inputId.outerHTML, {"class":"selector"});
+        selector.setAttribute("data-who-is","group");
+        return  selector.outerHTML;
     }
 
     var blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
