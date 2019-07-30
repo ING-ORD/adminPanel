@@ -25,18 +25,32 @@
             $answer[$i] = $row;
         }
     }else if ($_POST["who"] == "all"){
-        $sql = "SELECT name FROM group_name";
-        $timetable = mysqli_query($link, $sql) or die ("ошибка в запросе".mysqli_connect_error($link));
-        $rows = mysqli_num_rows($timetable);
         $answer = array(
             "group" => "ССА 18-11-1",
 
-            "listGroup" => array()
+            "list_group" => array(),
+            "list_teacher" => array(),
+            "list_room" => array(),
+            "list_lesson" => array()
         );
-        for ($i=0; $i < $rows; $i++){
-            $row = mysqli_fetch_row($timetable);
-            $answer["listGroup"][$i] = $row[0];
+        $list = array(
+            "1"=>"group",
+            "2"=>"teacher",
+            "3"=>"room",
+            "4"=>"lesson"
+        );
+        foreach ($list as $value){
+            $sql_group = "SELECT name FROM ".$value."_name";
+            $timetable_group = mysqli_query($link, $sql_group) or die ("ошибка в запросе".mysqli_connect_error($link));
+            $rows = mysqli_num_rows($timetable_group);
+
+            for ($i=0; $i < $rows; $i++){
+                $row = mysqli_fetch_row($timetable_group);
+                $key = "list_".$value;
+                $answer[$key][$i] = $row[0];
+            }
         }
+
     }
     // print_r($answer);
     echo json_encode($answer);
