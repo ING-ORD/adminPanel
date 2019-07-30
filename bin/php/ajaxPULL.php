@@ -33,7 +33,7 @@
 
             "listGroup" => array()
         );
-        for ($i=0; $i <= $rows; $i++){
+        for ($i=0; $i < $rows; $i++){
             $row = mysqli_fetch_row($timetable);
             $answer["listGroup"][$i] = $row[0];
         }

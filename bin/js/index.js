@@ -1,6 +1,7 @@
 
 //=====Загрузка страницы==
-var GROUPNAME = "";
+var groupname = "";
+
 ajaxPULL();
 //============END=============
 
@@ -32,12 +33,12 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
       if(!this.parentElement.querySelector(".days-items__input")){
 
           $(".wrap-pop-up").append( createEll_popUP( "",() => optionWeekButton(
-              {"name":"День недели"},
-              {"name":"Предмет"},
-              {"name":"Препадаватель"},
-              {"name":"Кабинет"}
+              {"title":"День недели"},
+              {"title":"Предмет"},
+              {"title":"Препадаватель"},
+              {"title":"Кабинет"}
           ) ) );
-          onClickPopUP();
+          // onClickPopUP();
           // ell = findAncestorTarget(e,"content-block-day")
           //
           // ell.querySelector(".wrap-days-items").innerHTML += createEll_DaysItems().outerHTML;
@@ -65,7 +66,7 @@ document.querySelector(".wrap-content-block").addEventListener("dblclick",functi
 function createEll_ContentBlock (){
     // var block__tool = CreateElementHTML("div","",{"class":"content-block__tool"})
     var day__tool = CreateElementHTML("div","",{ "class":"content-block-day__tool"});
-    var block__text = CreateElementHTML("div",GROUPNAME,{"class":"content-block__text"});
+    var block__text = CreateElementHTML("div",groupname,{"class":"content-block__text"});
     var contentBlock = CreateElementHTML("div",block__text.outerHTML,{"class":"content-block"});
     var daysItems = CreateElementHTML("div","",{"class":"wrap-days-items"});
 
@@ -97,21 +98,27 @@ function ajaxPUSHSeccess(data){
     // document.querySelector(".block-header__text").innerHTML ="(PHP REQUEST:"+answer+")"
 };
 
+//Получение данных с сервера
 function ajaxPULLSeccess(data){
     console.log(JSON.stringify(data));
     var data = JSON.parse(data);
+    console.log(data);
     var data_text = "";
-    GROUPNAME = data["group"]|| "ошибка";
+    groupname = data["group"]|| "ошибка";
     $(".wrap-content-block").append(createEll_ContentBlock());
     data = data || {};
 
     lesson = document.querySelectorAll(".content-block-day")
+
+    //Генерация страницы из данных
     for (var i = 0;i<lesson.length;i++){
         data_text = "";
         if (i in data){
             for (var j = 0;j<Object.keys(data[i]).length;j++){
+                //Создание элемента в поле дня
                 data_text += CreateElementHTML("div",data[i][j],{"class":"days-items__text"}).outerHTML;
             }
+            //Создание обертки для элементов дня
             lesson[i].querySelector(".wrap-days-items").innerHTML =
                                     CreateElementHTML("div",data_text,{"class":"days-items"}).outerHTML;
         }
@@ -159,7 +166,7 @@ function ajaxPULL(){
 //======POP-UP=====
 function onClickPopUP(){
     $(".pop-up__blur").click(function(){
-        GROUPNAME = document.querySelector(".selector__input").value;
+        groupname = document.querySelector(".selector__input").value;
         document.querySelector(".wrap-pop-up").innerHTML = "";
         $(".wrap-content-block").append(createEll_ContentBlock());
     });
@@ -167,9 +174,9 @@ function onClickPopUP(){
 
 function onClickPopUPEditor(ell){
     $(".pop-up__blur").click(function(){
-        GROUPNAME = document.querySelector(".selector__input").value
+        groupname = document.querySelector(".selector__input").value
         document.querySelector(".wrap-pop-up").innerHTML = "";
-        ell.innerText = GROUPNAME;
+        ell.innerText = groupname;
     });
 };
 
@@ -189,7 +196,9 @@ function createEll_popUP(val,func){
         // var text = CreateElementHTML("div","Группа",{"class":"pop-up__text"});
         // var input = CreateElementHTML("input","",{"class":"pop-up__input"});
         input.defaultValue = val;
-        return  text.outerHTML + input.outerHTML + inputId.outerHTML;
+
+        let html = CreateElementHTML("div",text.outerHTML + input.outerHTML + inputId.outerHTML,{"class":"selector"}).outerHTML;
+        return html;
     }
 
     var blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
@@ -199,23 +208,42 @@ function createEll_popUP(val,func){
     return html;
 }
 
-function optionWeekButton (){
-    var html = "";
-    for ( var i = 0; i < arguments.length; i++ ){
-        obj = arguments[i];
-        // var text = CreateElementHTML("div",obj.name,{"class":"pop-up__text"});
-        // var input = CreateElementHTML("input","",{"class":"pop-up__input"});
+function optionWeekButton (...rest){
+    var html = CreateElementHTML("div","",{"class":"wrap-selector"});
+    for ( var i = 0; i < rest.length; i++ ){
+        selector = CreateElementHTML("div","",{"class":"selector"});
 
-        var text = CreateElementHTML("div",obj.name,{"class":"selector__text"});
+        obj = rest[i];
+        let {title="ОШИБКА",data=[] } = obj;
+
+        var text = CreateElementHTML("div",title,{"class":"selector__text"});
         var input = CreateElementHTML("input","",{"class":"selector__input"});
         var inputId = CreateElementHTML("div","",{"class":"input-id"});
 
-        // var inner = text.outerHTML + input.outerHTML + inputId.outerHTML;
-        html += CreateElementHTML("div",text.outerHTML + input.outerHTML +
-                inputId.outerHTML,{"class":"selector"}).outerHTML;
+        inputId.append(createSoursAsdditions(data));
+
+        selector.append(text);
+        selector.append(input);
+        selector.append(inputId);
+
+        html.append(selector);
     }
 
-    return html;
+    return html.outerHTML;
+}
+
+function createSoursAsdditions (data){
+
+    for (let i = 0;i<data.length;i++){
+        let items =
+    }
+
+
+    return ((document.createElement("div")).innerHTML = '! '+data+' !');
+}
+
+function autoAdditions (){
+
 }
 
 //=======END=======
