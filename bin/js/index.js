@@ -33,10 +33,10 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
       if(!this.parentElement.querySelector(".days-items__input")){
 
           $(".wrap-pop-up").append( createEll_popUP( "",() => optionWeekButton(
-              {"title":"День недели"},
+              {"title":"День недели",data: [1,2,3,4]},
               {"title":"Предмет"},
               {"title":"Препадаватель"},
-              {"title":"Кабинет"}
+              {"title":"Кабинет",data: [1,2,3,4]}
           ) ) );
           // onClickPopUP();
           // ell = findAncestorTarget(e,"content-block-day")
@@ -218,9 +218,9 @@ function optionWeekButton (...rest){
 
         var text = CreateElementHTML("div",title,{"class":"selector__text"});
         var input = CreateElementHTML("input","",{"class":"selector__input"});
-        var inputId = CreateElementHTML("div","",{"class":"input-id"});
+        var inputId = CreateElementHTML("ul","",{"class":"input-id"});
 
-        inputId.append(createSoursAsdditions(data));
+        createSoursAdditions.call(inputId,data);
 
         selector.append(text);
         selector.append(input);
@@ -232,14 +232,75 @@ function optionWeekButton (...rest){
     return html.outerHTML;
 }
 
-function createSoursAsdditions (data){
+function createSoursAdditions (data){
+    console.log(data);
+    let popup = document.querySelector(".wrap-pop-up");
+    let inputId = this;
+    console.dir(popup);
+    let list = data;
 
-    for (let i = 0;i<data.length;i++){
-        let items =
-    }
+    popup.onclick = function(e){
+        // console.log("click");
+        if(e.target.classList.contains("selector__input")){
+            console.log("click");
+            console.log(list.length);
+            for (let i = 0;i<list.length;i++){
+                let content = list[i];
+                let item = CreateElementHTML("li",content,{class:"input-id__item"});
+                console.log(item);
+                // console.log(inputId);
+                // inputId.append(item);
+            }
+            // var search = obj[whoIs].filter( item => item.startsWith(this.value));
+
+            // elem.innerHTML = "";
+
+            // search.forEach(function (item){
+            //     elem.innerHTML += CreateElementHTML("div",item,{"class":"input-id__item"}).outerHTML;
+            // });
+            
+
+        }
+        // if(e.target.classList.contains(".selector__input")){
+
+        // }
+        // if(e.target.classList.contains(".selector__input")){
+
+        // }
+    };
+    popup.oninput = function(e){
+        // console.log("input1");
+        if(e.target.classList.contains("selector__input")){
+            console.log("input");
+            if(data){
+
+                for (let i = 0;i<data.length;i++){
+                    let content = data[i];
+                    let item = CreateElementHTML("div",content,{class:"input-id__item"});
+                    this.append(item)
+                }
+
+            }
+
+        }
+        // if(e.target.classList.contains(".selector__input")){
+
+        // }
+        // if(e.target.classList.contains(".selector__input")){
+
+        // }
+    };
+
+    // if(data){
+    //     for (let i = 0;i<data.length;i++){
+    //         let content = data[i];
+    //         let item = CreateElementHTML("div",content,{class:"input-id__item"});
+    //         this.append(item)
+    //     }
+    // }
 
 
-    return ((document.createElement("div")).innerHTML = '! '+data+' !');
+    // return ((document.createElement("div")).innerHTML = '! '+data+' !');
 }
 
 function autoAdditions (){
