@@ -24,3 +24,126 @@ function CreateElementHTML(tag,text,attributes){
     }
     return html;
 };
+
+function SelectorWichFind(options = {}){
+    var self = this;
+    
+    let create = function (tag){
+        return document.createElement(tag);
+    }
+    
+    let open = function(el){
+        el.classList.add("open");
+    }
+    
+    let close = function(el){
+        el.classList.remove("open");
+    }
+    
+    let toggle = function(el){
+        !el.classList.contains("open") ? open(el) : close(el);
+    }
+
+    let render = function(){
+        let {title="",who="",data=[]} = options;
+        
+        //create selector DOM
+        let selector = create("div");
+        selector.classList = "selector";
+        selector.setAttribute("data-who-is",who);
+    
+        //create ul-list DOM
+        let ul = create("ul");
+        ul.classList = "selector__list";
+    
+        //create heading DOM
+        let heading = create("div");
+        heading.classList = "selector__title";
+        heading.innerHTML = title;
+    
+        //create find DOM
+        let find = create("input");
+        find.defaultValue = "";
+        find.classList = "selector__list list";
+    
+        //filling selector, DOM elements
+        selector.append(heading);
+        selector.append(find);
+        selector.append(ul);
+        
+        //event onClick on selector
+        selector.onclick = function(e){
+    
+            if(e.target.classList.contains("selector__list")){
+                //if ul-list close
+                if(!ul.classList.contains("open")){
+                    //create elements for ul-list
+                    for (let i = 0; i < data.length; i++){
+                        let li = create("li");
+                        li.classList = "list__item";
+                        li.innerHTML = data[i];
+        
+                        ul.append(li);
+                    }
+    
+                } else {
+                    ul.innerHTML = "";
+                }
+                toggle(ul);
+                
+            }
+    
+            if(e.target.classList.contains("list__item")){
+                find.value = e.target.innerText;
+                ul.innerHTML = "";
+                ul.classList.remove("open");
+            }
+        };
+        //event onInput on selector
+        selector.oninput = function(e){
+    
+            if(e.target.classList.contains("selector__list")){
+                value = e.target.value;
+                //search value in array 'data'
+                let search = data.filter( item => item.startsWith(find.value));
+                
+                ul.innerHTML = "";
+    
+                for (let i = 0; i < search.length; i++){
+                    let li = create("li");
+                    li.classList = "list__item";
+                    li.innerHTML = search[i];
+    
+                    ul.append(li);
+                }
+            }
+        };
+        return selector;
+    }
+
+    let getSelector = function(){
+        return render();
+    }
+
+    let getOptions = function (){
+        return options.copy();
+    }
+
+    let setOptions = function(newOptions){
+        options = newOptions;
+    }
+
+    let upDataOptions = function(upDataOptions){
+        for (let key in upDataOptions){
+            options[key] = upDataOptions[key];
+        }
+    }
+
+    this.getSelector = getSelector;
+    this.getOptions = getOptions;
+    this.setOptions = setOptions;
+    this.upDataOptions = upDataOptions;
+    
+    
+}
+

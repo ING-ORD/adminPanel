@@ -1,6 +1,7 @@
 
 //=====Загрузка страницы==
 var groupname = "";
+var dataJson;
 
 ajaxPULL();
 //============END=============
@@ -32,12 +33,17 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
 
       if(!this.parentElement.querySelector(".days-items__input")){
 
-          $(".wrap-pop-up").append( createEll_popUP( "",() => optionWeekButton(
-              {"title":"День недели",data: [1,2,3,4]},
-              {"title":"Предмет"},
-              {"title":"Препадаватель"},
-              {"title":"Кабинет",data: [1,2,3,4]}
-          ) ) );
+          $(".wrap-pop-up").append( createEll_popUP( "",function (self) { 
+                console.log(dataJson);
+                let group = {title:"Группа",who:"group",data: dataJson["list_group"] };
+                let lesson = {title:"Предмет",who:"lesson",data: dataJson["list_lesson"] };
+                let room = {title:"Кабинет",who:"room",data: dataJson["list_room"] };
+                let week = {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };  
+                let teacher = {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]};  
+
+                return optionWeekButton.call(self,week,teacher,group,lesson,room);
+            }
+           ) );
           // onClickPopUP();
           // ell = findAncestorTarget(e,"content-block-day")
           //
@@ -101,22 +107,22 @@ function ajaxPUSHSeccess(data){
 //Получение данных с сервера
 function ajaxPULLSeccess(data){
     console.log(JSON.stringify(data));
-    var data = JSON.parse(data);
-    console.log(data);
+    dataJson = JSON.parse(data);
+    console.log(dataJson);
     var data_text = "";
-    groupname = data["group"]|| "ошибка";
+    groupname = dataJson["group"]|| "ошибка";
     $(".wrap-content-block").append(createEll_ContentBlock());
-    data = data || {};
+    dataJson = dataJson || {};
 
     lesson = document.querySelectorAll(".content-block-day")
 
     //Генерация страницы из данных
     for (var i = 0;i<lesson.length;i++){
         data_text = "";
-        if (i in data){
-            for (var j = 0;j<Object.keys(data[i]).length;j++){
+        if (i in dataJson){
+            for (var j = 0;j<Object.keys(dataJson[i]).length;j++){
                 //Создание элемента в поле дня
-                data_text += CreateElementHTML("div",data[i][j],{"class":"days-items__text"}).outerHTML;
+                data_text += CreateElementHTML("div",dataJson[i][j],{"class":"days-items__text"}).outerHTML;
             }
             //Создание обертки для элементов дня
             lesson[i].querySelector(".wrap-days-items").innerHTML =
@@ -201,110 +207,118 @@ function createEll_popUP(val,func){
         return html;
     }
 
-    var blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
-    var selector = CreateElementHTML("div", func(), {"class":"pop-up-content"} );
-    var html = CreateElementHTML("div",blur.outerHTML + selector.outerHTML,{"class":"pop-up"});
+    let html = document.createElement("div");
+    html.classList = "pop-up";
 
+    var blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
+    // func(html);
+    let selectors = CreateElementHTML("div","", {"class":"pop-up-content flex"} );
+    func(selectors);
+    
+    // selector.append(func());
+    // var selector = CreateElementHTML("div", func(), {"class":"pop-up-content"} );
+    html.append(blur);
+    html.append(selectors);
+    // var html = CreateElementHTML("div",blur.outerHTML + selector.outerHTML,{"class":"pop-up"});
+    console.log(html);
+    
     return html;
 }
 
+// function optionWeekButton (...rest){
+//     var html = CreateElementHTML("div","",{"class":"wrap-selector"});
+//     for ( var i = 0; i < rest.length; i++ ){
+//         selector = CreateElementHTML("div","",{"class":"selector"});
+
+//         obj = rest[i];
+//         let {title="ОШИБКА",data=[] } = obj;
+
+//         var text = CreateElementHTML("div",title,{"class":"selector__text"});
+//         var input = CreateElementHTML("input","",{"class":"selector__input"});
+//         var inputId = CreateElementHTML("ul","",{"class":"input-id"});
+
+//         createSoursAdditions.call(inputId,data);
+
+//         selector.append(text);
+//         selector.append(input);
+//         selector.append(inputId);
+
+//         html.append(selector);
+//     }
+
+//     return html.outerHTML;
+// }
+
 function optionWeekButton (...rest){
-    var html = CreateElementHTML("div","",{"class":"wrap-selector"});
-    for ( var i = 0; i < rest.length; i++ ){
-        selector = CreateElementHTML("div","",{"class":"selector"});
-
-        obj = rest[i];
-        let {title="ОШИБКА",data=[] } = obj;
-
-        var text = CreateElementHTML("div",title,{"class":"selector__text"});
-        var input = CreateElementHTML("input","",{"class":"selector__input"});
-        var inputId = CreateElementHTML("ul","",{"class":"input-id"});
-
-        createSoursAdditions.call(inputId,data);
-
-        selector.append(text);
-        selector.append(input);
-        selector.append(inputId);
-
-        html.append(selector);
+    var self = this;    
+    for(let i = 0; i < rest.length; i++){
+        console.log(rest[i])
+        var selector = new SelectorWichFind(rest[i]).getSelector();
+        
+        self.append(selector);
     }
-
-    return html.outerHTML;
+    // return selector;
 }
 
-function createSoursAdditions (data){
-    console.log(data);
-    let popup = document.querySelector(".wrap-pop-up");
-    let inputId = this;
-    console.dir(popup);
-    let list = data;
+// function createSoursAdditions (data){
+//     console.log(data);
+//     let popup = document.querySelector(".wrap-pop-up");
+//     let inputId = this;
+//     console.dir(popup);
+//     let list = data;
 
-    popup.onclick = function(e){
-        // console.log("click");
-        if(e.target.classList.contains("selector__input")){
-            console.log("click");
-            console.log(list.length);
-            for (let i = 0;i<list.length;i++){
-                let content = list[i];
-                let item = CreateElementHTML("li",content,{class:"input-id__item"});
-                console.log(item);
-                // console.log(inputId);
-                // inputId.append(item);
-            }
-            // var search = obj[whoIs].filter( item => item.startsWith(this.value));
+//     popup.onclick = function(e){
+//         if(e.target.classList.contains("selector__input")){
+//             console.log("click");
+//             console.log(list.length);
 
-            // elem.innerHTML = "";
+//             for (let i = 0;i<list.length;i++){
+//                 let content = list[i];
+//                 let item = CreateElementHTML("li",content,{class:"input-id__item"});
+//                 console.log(item);
+//             }
+//         }
+//     };
+//     popup.oninput = function(e){
+//         // console.log("input1");
+//         if(e.target.classList.contains("selector__input")){
+//             console.log("input");
+//             if(data){
 
-            // search.forEach(function (item){
-            //     elem.innerHTML += CreateElementHTML("div",item,{"class":"input-id__item"}).outerHTML;
-            // });
-            
+//                 for (let i = 0;i<data.length;i++){
+//                     let content = data[i];
+//                     let item = CreateElementHTML("div",content,{class:"input-id__item"});
+//                     this.append(item)
+//                 }
 
-        }
-        // if(e.target.classList.contains(".selector__input")){
+//             }
 
-        // }
-        // if(e.target.classList.contains(".selector__input")){
-
-        // }
-    };
-    popup.oninput = function(e){
-        // console.log("input1");
-        if(e.target.classList.contains("selector__input")){
-            console.log("input");
-            if(data){
-
-                for (let i = 0;i<data.length;i++){
-                    let content = data[i];
-                    let item = CreateElementHTML("div",content,{class:"input-id__item"});
-                    this.append(item)
-                }
-
-            }
-
-        }
-        // if(e.target.classList.contains(".selector__input")){
-
-        // }
-        // if(e.target.classList.contains(".selector__input")){
-
-        // }
-    };
-
-    // if(data){
-    //     for (let i = 0;i<data.length;i++){
-    //         let content = data[i];
-    //         let item = CreateElementHTML("div",content,{class:"input-id__item"});
-    //         this.append(item)
-    //     }
-    // }
+//         }
+//     }
+// }
 
 
-    // return ((document.createElement("div")).innerHTML = '! '+data+' !');
-}
+// console.log(optionWeekButton({"title":"День недели",who:"teacher",data: [1,2,3,4]}));
+// function autoAdditions (){
 
-function autoAdditions (){
-
-}
+// }
 
 //=======END=======
+
+// let selector = new SelectorWichFind({
+//     who:"room",
+//     data:["КЦПТ","Колдун","Волшебник", "Волун","Россия"]
+//     })
+
+// document.body.append(selector.getSelector());
+// console.log(selector.getOptions());
+
+// selector.setOptions({
+//     who:"teacher",
+//     data:["КЦПТ","Колдун","Колшебник", "Колун","Россия"]
+//     });
+
+// document.body.append(selector.getSelector());
+
+// selector.upDataOptions({data:["Работает", "Так", "Как", "Надо"]})
+// document.body.append(selector.getSelector());
