@@ -1,17 +1,20 @@
 
 //=====Загрузка страницы==
 var groupname = "";
-var dataJson;
-
+var dataJson = {};
 ajaxPULL();
+
+
+var popUpEllement = new PopUp();
+
 //============END=============
 
 //=========================BLOCK-HEADER=========================
 //Клик
 document.querySelector(".block-header").addEventListener("click",function(e){
     if(e.target.classList.contains("block-header__add")){
-        $(".wrap-pop-up").append(createEll_popUP());
-        onClickPopUP();
+        console.log(dataJson["list_group"]);
+        $(".wrap-pop-up").append(popUpEllement.getPopUp({ title: "Группа", who: "group", data: dataJson["list_group"]}));
     }
 })
 //==============================END=============================
@@ -19,37 +22,31 @@ document.querySelector(".block-header").addEventListener("click",function(e){
 //===================WRAP-CONTENT-BLOCK=========================
 //Клик
 document.querySelector(".wrap-content-block").addEventListener("click",function(e){
-  if(e.target.classList.contains("days-items__tool")){
-      if (this.parentElement.querySelector(".days-items__input").value != ""){
-          this.parentElement.querySelector(".days-items__input").outerHTML =
-                            CreateElementHTML("div",this.parentElement.querySelector(".days-items__input")
-                            .value,{"class":"days-items__text"}).outerHTML;
-          this.parentElement.querySelector(".days-items__tool").outerHTML = "";
-          ajaxPUSH(findAncestorTarget(e,"content-block"));
-      }
-  }
+    if(e.target.classList.contains("days-items__tool")){
+        if (this.parentElement.querySelector(".days-items__input").value != ""){
+            this.parentElement.querySelector(".days-items__input").outerHTML =
+                                CreateElementHTML("div",this.parentElement.querySelector(".days-items__input")
+                                .value,{"class":"days-items__text"}).outerHTML;
+            this.parentElement.querySelector(".days-items__tool").outerHTML = "";
+            ajaxPUSH(findAncestorTarget(e,"content-block"));
+        }
+    }
 
-  if (e.target.classList.contains("content-block-day__tool")){
+    if (e.target.classList.contains("content-block-day__tool")){
 
-      if(!this.parentElement.querySelector(".days-items__input")){
-
-          $(".wrap-pop-up").append( createEll_popUP( "",function (self) { 
-                console.log(dataJson);
-                let group = {title:"Группа",who:"group",data: dataJson["list_group"] };
-                let lesson = {title:"Предмет",who:"lesson",data: dataJson["list_lesson"] };
-                let room = {title:"Кабинет",who:"room",data: dataJson["list_room"] };
-                let week = {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };  
-                let teacher = {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]};  
-
-                return optionWeekButton.call(self,week,teacher,group,lesson,room);
-            }
-           ) );
-          // onClickPopUP();
-          // ell = findAncestorTarget(e,"content-block-day")
-          //
-          // ell.querySelector(".wrap-days-items").innerHTML += createEll_DaysItems().outerHTML;
-      }
-  }
+        if(!this.parentElement.querySelector(".days-items__input")){
+            $(".wrap-pop-up").append( popUpEllement.getPopUp(
+                {title:"Группа",who:"group",data: dataJson["list_group"] },
+                {title:"Предмет",who:"lesson",data: dataJson["list_lesson"] },
+                {title:"Номер урок",who:"numLesson",data: [1,2,3,4,5,6,7,8,9,10,11,12]},
+                {title:"Подгруппа",who:"subGroup",data: [1,2,3,4]},
+                {title:"Кабинет",who:"room",data: dataJson["list_room"] },
+                {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] }, 
+                {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]}
+                ) 
+            );
+        }
+    }
 });
 //Двойной клик
 document.querySelector(".wrap-content-block").addEventListener("dblclick",function(e){
@@ -170,14 +167,6 @@ function ajaxPULL(){
 };
 //=============END=============
 //======POP-UP=====
-function onClickPopUP(){
-    $(".pop-up__blur").click(function(){
-        groupname = document.querySelector(".selector__input").value;
-        document.querySelector(".wrap-pop-up").innerHTML = "";
-        $(".wrap-content-block").append(createEll_ContentBlock());
-    });
-};
-
 function onClickPopUPEditor(ell){
     $(".pop-up__blur").click(function(){
         groupname = document.querySelector(".selector__input").value
@@ -193,25 +182,26 @@ function onClickPopUPEditor(ell){
 function createEll_popUP(val,func){
     var val = val || "";
 
-    var func = func || function (){
+    var func = func || function (select){
 
-        var text = CreateElementHTML("div","Группа",{"class":"selector__text"});
-        var input = CreateElementHTML("input","",{"class":"selector__input"});
-        var inputId = CreateElementHTML("div","",{"class":"input-id"});
+        let selector = new SelectorWichFind({title:"Группа",who:"group",data: dataJson["list_group"] }).getSelector();
+
+        // var text = CreateElementHTML("div","Группа",{"class":"selector__text"});
+        // var input = CreateElementHTML("input","",{"class":"selector__input"});
+        // var inputId = CreateElementHTML("div","",{"class":"input-id"});
 
         // var text = CreateElementHTML("div","Группа",{"class":"pop-up__text"});
         // var input = CreateElementHTML("input","",{"class":"pop-up__input"});
-        input.defaultValue = val;
+        // input.defaultValue = val;
 
-        let html = CreateElementHTML("div",text.outerHTML + input.outerHTML + inputId.outerHTML,{"class":"selector"}).outerHTML;
-        return html;
+        // let html = CreateElementHTML("div",text.outerHTML + input.outerHTML + inputId.outerHTML,{"class":"selector"}).outerHTML;
+        return select.append(selector);
     }
 
     let html = document.createElement("div");
     html.classList = "pop-up";
 
     var blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
-    // func(html);
     let selectors = CreateElementHTML("div","", {"class":"pop-up-content flex"} );
     func(selectors);
     
@@ -252,12 +242,11 @@ function createEll_popUP(val,func){
 function optionWeekButton (...rest){
     var self = this;    
     for(let i = 0; i < rest.length; i++){
-        console.log(rest[i])
+
         var selector = new SelectorWichFind(rest[i]).getSelector();
         
         self.append(selector);
     }
-    // return selector;
 }
 
 // function createSoursAdditions (data){
@@ -322,3 +311,20 @@ function optionWeekButton (...rest){
 
 // selector.upDataOptions({data:["Работает", "Так", "Как", "Надо"]})
 // document.body.append(selector.getSelector());
+
+// var popUpEllement = new PopUp(
+//     function (self) { 
+        
+//         let group = {title:"Группа",who:"group",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };
+//         let lesson = {title:"Предмет",who:"lesson",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };
+//         let room = {title:"Кабинет",who:"room",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };
+//         let week = {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] };  
+//         let teacher = {title:"Перподаватель",who:"teacher",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"]};  
+
+//         return optionWeekButton.call(self,week,teacher,group,lesson,room);
+//     },
+//     {title:"Группа",who:"group",data: [] }
+// );
+
+// setTimeout( console.log(popUpEllement.getPopUp()),3000);
+// document.body.append(popUpEllement.getPopUp());

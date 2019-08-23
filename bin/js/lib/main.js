@@ -25,6 +25,81 @@ function CreateElementHTML(tag,text,attributes){
     return html;
 };
 
+function PopUp(){
+    let self = this;
+    let defaultOptions = {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"] };
+
+    let callback = function (optRest){
+        let self = this; 
+        let rest = optRest.length ? optRest : defaultOptions;  
+        console.log(rest);
+         
+        for(let i = 0; i < rest.length; i++){
+
+            let selector = new SelectorWichFind(rest[i]).getSelector();
+            
+            self.append(selector);
+        }
+    }
+
+    let create = function (tag){
+        return document.createElement(tag);
+    }
+
+    let open = function(el){
+        el.classList.add("open");
+    }
+    
+    let close = function(el){
+        el.classList.remove("open");
+    }
+    
+    let toggle = function(el){
+        !el.classList.contains("open") ? open(el) : close(el);
+    }
+
+    let isValue = function(el){
+        let isValueInput = true;
+        let inputs = el.querySelectorAll("input");
+        [].forEach.call(inputs,function(item){
+            if (item.value == "") {
+                isValueInput = false; 
+            };
+        });
+        return isValueInput;
+    }
+
+    let render = function(options){
+        let popUp = create("div");
+        popUp.classList = "pop-up";
+
+        let blur = CreateElementHTML("div", "", {"class" : "pop-up__blur"} );
+        let selectors = CreateElementHTML("div","", {"class":"pop-up-content flex"} );
+        callback.call(selectors,options);
+
+        popUp.append(blur);
+        popUp.append(selectors);
+
+        popUp.onclick = function(e){
+            if(e.target.classList.contains("pop-up__blur")){
+                let check = isValue(popUp);
+                if(check){
+                    popUp.outerHTML = "";
+                }
+            }
+        }
+
+        return popUp;
+    }
+
+    let getPopUp = function(...rest) {
+        return render(rest);
+    }
+
+    this.getPopUp = getPopUp;
+}
+
+
 function SelectorWichFind(options = {}){
     var self = this;
     
