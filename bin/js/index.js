@@ -13,7 +13,6 @@ var popUpEllement = new PopUp();
 //Клик
 document.querySelector(".block-header").addEventListener("click",function(e){
     if(e.target.classList.contains("block-header__add")){
-        console.log(dataJson["list_group"]);
         $(".wrap-pop-up").append(popUpEllement.getPopUp({ title: "Группа", who: "group", data: dataJson["list_group"]}));
     }
 })
@@ -45,9 +44,15 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
                 {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]}
                 ) 
             );
+
         }
     }
 });
+
+document.body.addEventListener("closepopup",function(e){
+    ajaxPUSH(popUpEllement.getAllValue());
+});
+
 //Двойной клик
 document.querySelector(".wrap-content-block").addEventListener("dblclick",function(e){
   if(e.target.classList.contains("days-items__text")){
@@ -59,8 +64,7 @@ document.querySelector(".wrap-content-block").addEventListener("dblclick",functi
       }
   }
   if (e.target.classList.contains("content-block__text")){
-      $(".wrap-pop-up").append(createEll_popUP(e.target.innerText));
-      onClickPopUPEditor(e.target);
+      $(".wrap-pop-up").append(popUpEllement.getPopUp({title:"Группа",who:"group",data: dataJson["list_group"] ,value: e.target.innerText}));
   }
 });
 //==============================END=============================
@@ -129,31 +133,46 @@ function ajaxPULLSeccess(data){
 };
 
 //ajax push request in the server
-function ajaxPUSH(ancestor){
-    var PUSH = {};
-    var group = ancestor
-    var nameGroup = group.querySelector(".content-block__text").innerText;
-    PUSH["group"] = nameGroup;
-    var day = group.querySelectorAll(".content-block-day")
-    for (var j = 0;j<day.length; j++){
-        var lessons = day[j].querySelectorAll(".days-items__text");
-        var lesson = [];
-        for (var k = 0;k<lessons.length; k++){
+// function ajaxPUSH(ancestor){
+//     var PUSH = {};
+//     var group = ancestor
+//     var nameGroup = group.querySelector(".content-block__text").innerText;
+//     PUSH["group"] = nameGroup;
+//     var day = group.querySelectorAll(".content-block-day")
+//     for (var j = 0;j<day.length; j++){
+//         var lessons = day[j].querySelectorAll(".days-items__text");
+//         var lesson = [];
+//         for (var k = 0;k<lessons.length; k++){
 
-            lesson[k] = lessons[k].innerText;
-        }
-        PUSH[j] = lesson;
+//             lesson[k] = lessons[k].innerText;
+//         }
+//         PUSH[j] = lesson;
+//     }
+
+//     $.ajax({
+//         url: "bin/php/ajaxPUSH.php",
+//         type:"POST",
+//         data: PUSH ,
+//         datatype: "json",
+//         success: ajaxPUSHSeccess
+//     });
+//     // console.log(parametrs);
+// };
+
+let ajaxPUSH = function(options){
+    let req = {
+        who:"all",
+        is_del:"false",
     }
-
+    req["data"] = options
     $.ajax({
         url: "bin/php/ajaxPUSH.php",
         type:"POST",
-        data: PUSH ,
+        data: req ,
         datatype: "json",
         success: ajaxPUSHSeccess
     });
-    // console.log(parametrs);
-};
+}
 
 function ajaxPULL(){
     $.ajax({
@@ -213,40 +232,6 @@ function createEll_popUP(val,func){
     console.log(html);
     
     return html;
-}
-
-// function optionWeekButton (...rest){
-//     var html = CreateElementHTML("div","",{"class":"wrap-selector"});
-//     for ( var i = 0; i < rest.length; i++ ){
-//         selector = CreateElementHTML("div","",{"class":"selector"});
-
-//         obj = rest[i];
-//         let {title="ОШИБКА",data=[] } = obj;
-
-//         var text = CreateElementHTML("div",title,{"class":"selector__text"});
-//         var input = CreateElementHTML("input","",{"class":"selector__input"});
-//         var inputId = CreateElementHTML("ul","",{"class":"input-id"});
-
-//         createSoursAdditions.call(inputId,data);
-
-//         selector.append(text);
-//         selector.append(input);
-//         selector.append(inputId);
-
-//         html.append(selector);
-//     }
-
-//     return html.outerHTML;
-// }
-
-function optionWeekButton (...rest){
-    var self = this;    
-    for(let i = 0; i < rest.length; i++){
-
-        var selector = new SelectorWichFind(rest[i]).getSelector();
-        
-        self.append(selector);
-    }
 }
 
 // function createSoursAdditions (data){

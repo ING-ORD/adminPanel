@@ -27,12 +27,13 @@ function CreateElementHTML(tag,text,attributes){
 
 function PopUp(){
     let self = this;
+    let allValue = {};
+
     let defaultOptions = {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"] };
 
     let callback = function (optRest){
         let self = this; 
-        let rest = optRest.length ? optRest : defaultOptions;  
-        console.log(rest);
+        let rest = optRest.length ? optRest : defaultOptions;
          
         for(let i = 0; i < rest.length; i++){
 
@@ -63,10 +64,32 @@ function PopUp(){
         let inputs = el.querySelectorAll("input");
         [].forEach.call(inputs,function(item){
             if (item.value == "") {
-                isValueInput = false; 
+                isValueInput = false;
             };
         });
         return isValueInput;
+    }
+
+    // let allValue = (function(){
+    //     let value = {};
+    //     return function (...rest){
+    //         if(rest.length != 0){
+    //             value[rest[0]] = rest[1]
+    //         } else {
+    //             return value
+    //         }
+    //     }
+    // })();
+
+    let findAllValue = function(el){
+        let inputs = el.querySelectorAll("input");
+        allValue = {};
+        [].forEach.call(inputs,function(item){
+            let value = item.value;
+            let key = findAncestor(item,"selector").dataset["whoIs"];
+            allValue[key] = value
+
+        });
     }
 
     let render = function(options){
@@ -84,6 +107,9 @@ function PopUp(){
             if(e.target.classList.contains("pop-up__blur")){
                 let check = isValue(popUp);
                 if(check){
+                    findAllValue(popUp);
+                    let event = new CustomEvent("closepopup",{bubbles:true});
+                    popUp.dispatchEvent(event);
                     popUp.outerHTML = "";
                 }
             }
@@ -96,6 +122,11 @@ function PopUp(){
         return render(rest);
     }
 
+    let getAllValue = function() {
+        return allValue;
+    }
+
+    this.getAllValue = getAllValue;
     this.getPopUp = getPopUp;
 }
 
@@ -120,7 +151,7 @@ function SelectorWichFind(options = {}){
     }
 
     let render = function(){
-        let {title="",who="",data=[]} = options;
+        let {title="",who="",data=[],value=""} = options;
         
         //create selector DOM
         let selector = create("div");
@@ -138,7 +169,7 @@ function SelectorWichFind(options = {}){
     
         //create find DOM
         let find = create("input");
-        find.defaultValue = "";
+        find.defaultValue = value;
         find.classList = "selector__list list";
     
         //filling selector, DOM elements

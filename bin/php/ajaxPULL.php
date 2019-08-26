@@ -1,22 +1,17 @@
 <?php
 
-
-
-
-
-
     $dbHost = 'localhost';
   	$dbUser = 'root';
   	$dbPass = '';
   	$dbName = 'project';
 
-  	$link = mysqli_connect($dbHost,$dbUser,$dbPass,$dbName) or die ("ошибка".mysqli_connect_error($link));
+  	$link = mysqli_connect($dbHost,$dbUser,$dbPass,$dbName) or die ("ошибка ".mysqli_connect_error($link));
 
     if ($_POST["who"] != "all"){
 
         $sql = "SELECT * FROM ".$_POST["who"]."_name";
 
-      	$timetable = mysqli_query($link, $sql) or die ("ошибка в запросе".mysqli_connect_error($link));
+      	$timetable = mysqli_query($link, $sql) or die ("ошибка в запросе ".mysqli_connect_error($link));
       	$rows = mysqli_num_rows($timetable);
         $answer = array();
         $answer[0] = $_POST["who"];

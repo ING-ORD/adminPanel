@@ -16,7 +16,12 @@
   // };
   // $who = $is_who[ $_POST["who"] ];
   print_r($_POST);
+  //Здесь будет определение общий это запрос или нет
+  // А еще точнее это запрос от основной стр или нет
+  // PRESS F
   if ($_POST["who"] != "all"){
+        //при удалении надо добавить логику удаление из всех мест данных связанных с удаляемыми, 
+        // иначе получится что элемента уже не существует а данные о нем хранятся в другом месте и тем самы вызовут ошибки.
         if ($_POST["is_del"] != "false") {
             // $first_sql = "SELECT * FROM ".$_POST["who"]."_name WHERE name = '". $_POST["what"]."';";
             // $first_timetable = mysqli_query($link, $first_sql) or die ("ошибка с запросом first_sql ".mysqli_connect_error($link));
@@ -52,8 +57,21 @@
             $insert_sql = "INSERT INTO ".$_POST["who"]."_name VALUES (".$id.", '".$_POST["what"]."');";
             $insert_timetable = mysqli_query($link, $insert_sql) or die ("ошибка с запросом insert_sql".mysqli_connect_error($link));
         }
+  }else{
+    $data = $_POST["data"];
+    if ($_POST["is_del"] != "false"){
+        print_r("2");
+        
+
+    } else {
+        $sql = "";
+        $group_id = "";
+
+        $sql = "INSERT INTO timetable (`group`, `day`, `lesson_id`, `subgroup`, `lesson`, `teacher`, `room`) VALUES ( ".$data['group'].", ".$data['day'].", ".$data['numLesson'].", ".$data['subGroup'].", ".$data['lesson'].", ".$data['teacher'].", ".$data['room']." ) ;";
+        $insert_sql = mysqli_query($link, $sql) or die ("ошибка с запросом insert_sql ".mysqli_connect_error($link));
+    }
   }
-  print_r($sql);
+//   print_r($sql);
   // $timetable = mysqli_query($link, $sql) or die ("ошибка с запросом ".mysqli_connect_error($link));
   // }else {
   //     if ($_POST["is_del"] == true) {
