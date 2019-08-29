@@ -118,6 +118,17 @@ body{
     text-align: center;
 }
 
+.day-items{
+    display: flex;
+    
+}
+
+.items{
+    padding-left: 5px;
+    padding-right: 5px;
+    border-left: solid 1px #000
+}
+
 .flex
 {
     display: flex;

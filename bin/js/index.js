@@ -35,12 +35,12 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
 
         if(!this.parentElement.querySelector(".days-items__input")){
             $(".wrap-pop-up").append( popUpEllement.getPopUp(
-                {title:"Группа",who:"group",data: dataJson["list_group"] },
+                {title:"Группа",who:"group",data: dataJson["list_group"] ,value: findAncestorTarget(e, "content-block").querySelector(".content-block__text").innerText},
                 {title:"Предмет",who:"lesson",data: dataJson["list_lesson"] },
-                {title:"Номер урок",who:"numLesson",data: [1,2,3,4,5,6,7,8,9,10,11,12]},
-                {title:"Подгруппа",who:"subGroup",data: [1,2,3,4]},
+                {title:"Номер урок",who:"numlesson",data: [1,2,3,4,5,6,7,8,9,10,11,12]},
+                {title:"Подгруппа",who:"subgroup",data: [1,2,3,4]},
                 {title:"Кабинет",who:"room",data: dataJson["list_room"] },
-                {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] }, 
+                {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] , value: findAncestorTarget(e,"content-block-day").querySelector(".day-items__title").innerText  }, 
                 {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]}
                 ) 
             );
@@ -51,6 +51,8 @@ document.querySelector(".wrap-content-block").addEventListener("click",function(
 
 document.body.addEventListener("closepopup",function(e){
     ajaxPUSH(popUpEllement.getAllValue());
+    //Здесь когда будет полностью ооп проект то надо сделать это через интерфейс соответсвующего элемента(самой структуры)
+    createStructureTree(popUpEllement.getAllValue());
 });
 
 //Двойной клик
@@ -78,7 +80,7 @@ function createEll_ContentBlock (){
     var daysItems = CreateElementHTML("div","",{"class":"wrap-days-items"});
 
     ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"].forEach(function(item) {
-        var days__text = CreateElementHTML("div",item,{"class":"day-items"});
+        var days__text = CreateElementHTML("div",item,{"class":"day-items__title"});
         contentBlock.innerHTML += CreateElementHTML("div",day__tool.outerHTML +
                                                     days__text.outerHTML + daysItems.outerHTML,{"class":"content-block-day"}).outerHTML;
     });
@@ -111,7 +113,7 @@ function ajaxPULLSeccess(data){
     dataJson = JSON.parse(data);
     console.log(dataJson);
     var data_text = "";
-    groupname = dataJson["group"]|| "ошибка";
+    groupname = dataJson["data"][0]["group"]|| "ошибка";
     $(".wrap-content-block").append(createEll_ContentBlock());
     dataJson = dataJson || {};
 
@@ -159,12 +161,13 @@ function ajaxPULLSeccess(data){
 //     // console.log(parametrs);
 // };
 
-let ajaxPUSH = function(options){
+let ajaxPUSH = function(options,prefics){
+    let {is_del ="false"} = prefics || {is_del:"false"};
     let req = {
-        who:"all",
-        is_del:"false",
+        who: "all",
+        is_del,
     }
-    req["data"] = options
+    req["data"] = options;
     $.ajax({
         url: "bin/php/ajaxPUSH.php",
         type:"POST",
@@ -232,6 +235,72 @@ function createEll_popUP(val,func){
     console.log(html);
     
     return html;
+}
+
+function createStructureTree(options) {
+    let titles = document.querySelectorAll(".content-block__text");
+    for (let i = 0; i < titles.length; i++){
+        if (options.group == titles[i].innerText){
+            let wrapDay = findAncestor(titles[i],"content-block").querySelectorAll(".wrap-days-items"); 
+            // console.log(wrapDay);
+            let listDay = findAncestor(titles[i],"content-block").querySelectorAll(".day-items__title");
+            for (let j = 0; j < wrapDay.length; j++ ){
+                if (options.week == listDay[j].innerText){
+                    let numlesson = document.createElement("div");
+                    let subgroup = document.createElement("div");
+                    let lesson = document.createElement("div");
+                    let teacher = document.createElement("div");
+                    let room = document.createElement("div");
+                    let remove = document.createElement("div");
+
+                    numlesson.innerText = options.numlesson;
+                    subgroup.innerText = options.subgroup;
+                    lesson.innerText = options.lesson;
+                    teacher.innerText = options.teacher;
+                    room.innerText = options.room;
+                    remove.innerText = "X";
+
+                    numlesson.dataset["whoIs"] = "numlesson";
+                    subgroup.dataset["whoIs"] = "subgroup";
+                    lesson.dataset["whoIs"] = "lesson";
+                    teacher.dataset["whoIs"] = "teacher";
+                    room.dataset["whoIs"] = "room";
+                    remove.dataset["whoIs"] = "remove";
+
+                    numlesson.classList = "items";
+                    subgroup.classList = "items";
+                    lesson.classList = "items";
+                    teacher.classList = "items";
+                    room.classList = "items";
+                    remove.classList = "items";
+
+                    let continer = document.createElement("div");
+                    continer.classList = "day-items";
+
+                    remove.onclick = function(){
+                        continer.outerHTML = "";
+                        ajaxPUSH(popUpEllement.getAllValue(), {is_del:true});
+
+                    };
+
+                    continer.append(numlesson);
+                    continer.append(subgroup);
+                    continer.append(lesson);
+                    continer.append(teacher);
+                    continer.append(room);
+                    continer.append(remove);
+                    
+                    wrapDay[j].append(continer);
+
+                    // console.log(Day);
+                }
+            }
+            break;
+        } else {
+            console.log("desoptions");
+            break;
+        }
+    }
 }
 
 // function createSoursAdditions (data){
