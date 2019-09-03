@@ -13,7 +13,17 @@ var popUpEllement = new PopUp();
 //Клик
 document.querySelector(".block-header").addEventListener("click",function(e){
     if(e.target.classList.contains("block-header__add")){
-        $(".wrap-pop-up").append(popUpEllement.getPopUp({ title: "Группа", who: "group", data: dataJson["list_group"]}));
+        // $(".wrap-pop-up").append(popUpEllement.getPopUp({ title: "Группа", who: "group", data: dataJson["list_group"]}));
+        $(".wrap-pop-up").append( popUpEllement.getPopUp(
+            {title:"Группа",who:"group",data: dataJson["list_group"]},
+            {title:"Предмет",who:"lesson",data: dataJson["list_lesson"] },
+            {title:"Номер урок",who:"numlesson",data: [1,2,3,4,5,6,7,8,9,10,11,12]},
+            {title:"Подгруппа",who:"subgroup",data: [1,2,3,4]},
+            {title:"Кабинет",who:"room",data: dataJson["list_room"] },
+            {title:"День недели",who:"week",data: ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"] }, 
+            {title:"Перподаватель",who:"teacher",data: dataJson["list_teacher"]}
+            ) 
+        );
     }
 })
 //==============================END=============================
@@ -109,29 +119,59 @@ function ajaxPUSHSeccess(data){
 
 //Получение данных с сервера
 function ajaxPULLSeccess(data){
-    console.log(JSON.stringify(data));
+    // console.log(JSON.stringify(data));
     dataJson = JSON.parse(data);
-    console.log(dataJson);
-    var data_text = "";
-    groupname = dataJson["data"][0]["group"]|| "ошибка";
-    $(".wrap-content-block").append(createEll_ContentBlock());
-    dataJson = dataJson || {};
-
-    lesson = document.querySelectorAll(".content-block-day")
-
-    //Генерация страницы из данных
-    for (var i = 0;i<lesson.length;i++){
-        data_text = "";
-        if (i in dataJson){
-            for (var j = 0;j<Object.keys(dataJson[i]).length;j++){
-                //Создание элемента в поле дня
-                data_text += CreateElementHTML("div",dataJson[i][j],{"class":"days-items__text"}).outerHTML;
+    alert(data);
+    // var data_text = "";
+    // groupname = dataJson["data"][0]["group"]|| "ошибка";
+    // $(".wrap-content-block").append(createEll_ContentBlock());
+    // dataJson = dataJson || {};
+    let checkGroupInTree = function (ell , check){
+        for(let i = 0; i < ell.length; i++){
+            if (ell[i].innerText == check){
+                return true;
             }
-            //Создание обертки для элементов дня
-            lesson[i].querySelector(".wrap-days-items").innerHTML =
-                                    CreateElementHTML("div",data_text,{"class":"days-items"}).outerHTML;
         }
+        return false;
     }
+    console.log(dataJson);
+    dataJson["data"] = dataJson["data"] || {};
+    for(let i = 0; i < dataJson["data"].length ; i++){
+        if (checkGroupInTree ( document.querySelectorAll(".content-block__text") , dataJson["data"][i]["group"])){
+            // let groupList = document.querySelectorAll(".content-block__text");
+
+            createStructureTree(dataJson["data"][i]);
+
+            // for(let j = 0; j < groupList.length; j++){
+            //     console.log(dataJson["data"][i]["group"]);
+            //     if (dataJson["data"][i]["group"] == groupList[j].innerText){
+            //         createStructureTree(dataJson["data"][i]);
+            //     }
+            // }
+
+        }else{
+            groupname = dataJson["data"][i]["group"]|| "ошибка";
+            $(".wrap-content-block").append(createEll_ContentBlock());
+            createStructureTree(dataJson["data"][i]);
+        }
+        
+        
+    }
+    // lesson = document.querySelectorAll(".content-block-day")
+
+    // //Генерация страницы из данных
+    // for (var i = 0;i<lesson.length;i++){
+    //     data_text = "";
+    //     if (i in dataJson){
+    //         for (var j = 0;j<Object.keys(dataJson[i]).length;j++){
+    //             //Создание элемента в поле дня
+    //             data_text += CreateElementHTML("div",dataJson[i][j],{"class":"days-items__text"}).outerHTML;
+    //         }
+    //         //Создание обертки для элементов дня
+    //         lesson[i].querySelector(".wrap-days-items").innerHTML =
+    //                                 CreateElementHTML("div",data_text,{"class":"days-items"}).outerHTML;
+    //     }
+    // }
 };
 
 //ajax push request in the server
@@ -279,7 +319,7 @@ function createStructureTree(options) {
 
                     remove.onclick = function(){
                         continer.outerHTML = "";
-                        ajaxPUSH(popUpEllement.getAllValue(), {is_del:true});
+                        ajaxPUSH(options, {is_del:true});
 
                     };
 
@@ -295,9 +335,6 @@ function createStructureTree(options) {
                     // console.log(Day);
                 }
             }
-            break;
-        } else {
-            console.log("desoptions");
             break;
         }
     }

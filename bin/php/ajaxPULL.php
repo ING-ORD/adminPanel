@@ -44,7 +44,7 @@
             }
         }
         
-        $sql = "SELECT `group`.`name` as `group`, `week`.`name` as `week`, `timetable`.`numlesson`, `timetable`.`subgroup`, `lesson`.`name` as `lesson`, `teacher`.`name` as `teacher`, `room`.`name` as `room` FROM `timetable`, `week`,`teacher`,`room`,`lesson`,`group`  WHERE `timetable`.`group` = `group`.`id` AND `timetable`.`week` = `week`.`id` AND `timetable`.`teacher` = `teacher`.`id` AND `timetable`.`lesson` = `lesson`.`id` AND `timetable`.`room` = `room`.`id`";
+        $sql = "SELECT `group`.`name` as `group`, `week`.`name` as `week`, `timetable`.`numlesson`, `timetable`.`subgroup`, `lesson`.`name` as `lesson`, `teacher`.`name` as `teacher`, `room`.`name` as `room` FROM `timetable`, `week`,`teacher`,`room`,`lesson`,`group`  WHERE `timetable`.`group` = `group`.`id` AND `timetable`.`week` = `week`.`id` AND `timetable`.`teacher` = `teacher`.`id` AND `timetable`.`lesson` = `lesson`.`id` AND `timetable`.`room` = `room`.`id` ORDER BY `week`,`numlesson`";
         $timetable = mysqli_query($link, $sql) or die ("ошибка в запросе all 50 ".mysqli_connect_error($link));
         $rows = mysqli_num_rows($timetable);
         
